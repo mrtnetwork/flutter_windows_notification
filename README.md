@@ -36,62 +36,66 @@ NotificationMessage message = NotificationMessage.fromPluginTemplate(
 _winNotifyPlugin.showNotificationPluginTemplate(message);
 
 ```
-Notification with imge and large imgae
+#### Notification with imge and large imgae
 
 ![fix2](https://user-images.githubusercontent.com/56779182/205485419-4303fdca-9f96-48e8-b6af-6f0df2ce8419.png)
 
-Notification with imge
+#### Notification with imge
 
 ![fix3](https://user-images.githubusercontent.com/56779182/205485467-16f51b78-9dd4-4420-9de4-16c904e6871e.png)
 
-notification without any image
+#### notification without any image
 
 ![fix1](https://user-images.githubusercontent.com/56779182/205485486-abba6ed9-d56a-4a56-bbd5-0c7485376604.png)
 
 
-You can also create Wallet files with this library. To do so, you first need
-the private key you want to encrypt and a desired password. Then, create
-your wallet with
+### Send notification with plugin template
+
+You can use the template made by you to send the notification
+You can find a lot of templates code  with a simple search on the Internet
+
+
+#### Several examples of these templates
 
 ```dart
-Wallet wallet = Wallet.createNew(credentials, "password", random);
-print(wallet.toJson());
+    const String template = '''
+<toast activationType="protocol">
+  <visual>
+    <binding template="ToastGeneric">
+      <text>Weather app</text>
+      <text>Expect rain today.</text>
+      <group>
+        <subgroup hint-weight="1" hint-textStacking="center">
+          <text hint-align="center" hint-style="header">15°</text>
+          <text hint-align="center" hint-style="SubtitleSubtle">Rainy</text>
+        </subgroup>
+        <subgroup hint-weight="1">
+          <text hint-align="center">Mon</text>
+          <image src="C:/Users/HP/Desktop/wallet_images/sun.jpg" hint-removeMargin="true" />
+          <text hint-align="center">15°</text>
+        </subgroup>
+        <subgroup hint-weight="1">
+          <text hint-align="center">Tue</text>
+          <image src="C:/Users/HP/Desktop/wallet_images/sun.jpg" hint-removeMargin="true" />
+          <text hint-align="center">17°</text>
+        </subgroup>
+        <subgroup hint-weight="1">
+          <text hint-align="center">Wed</text>
+          <image src="C:/Users/HP/Desktop/wallet_images/w.jpg" hint-removeMargin="true" />
+          <text hint-align="center">21°</text>
+        </subgroup>
+      </group>
+    </binding>
+  </visual>
+</toast>
+''';
+
+    NotificationMessage message =
+        NotificationMessage.fromCustomTemplate("notificationid_1", group: "weather_group");
+    _winNotifyPlugin.showNotificationCustomTemplate(message, template);
 ```
+![weather](https://user-images.githubusercontent.com/56779182/205485702-98ed8779-483f-433b-8f00-4ca5ca130fc5.png)
 
-You can also write `wallet.toJson()` into a file which you can later open
-with [MyEtherWallet](https://www.myetherwallet.com/#view-wallet-info)
-(select Keystore / JSON File) or other Ethereum clients like geth.
-
-#### Custom credentials
-
-If you want to integrate `web3dart` with other wallet providers, you can implement
-`Credentials` and override the appropriate methods.
-
-### Connecting to an RPC server
-
-The library won't send signed transactions to miners itself. Instead,
-it relies on an RPC client to do that. You can use a public RPC API like
-[infura](https://infura.io/), setup your own using [geth](https://github.com/ethereum/go-ethereum/wiki/geth)
-or, if you just want to test things out, use a private testnet with
-[truffle](https://www.trufflesuite.com/) and [ganache](https://www.trufflesuite.com/ganache). All these options will give you
-an RPC endpoint to which the library can connect.
-
-```dart
-import 'package:http/http.dart'; //You can also import the browser version
-import 'package:web3dart/web3dart.dart';
-
-var apiUrl = "http://localhost:7545"; //Replace with your API
-
-var httpClient = Client();
-var ethClient = Web3Client(apiUrl, httpClient);
-
-var credentials = EthPrivateKey.fromHex("0x...");
-var address = await credentials.extractAddress();
-
-// You can now call rpc methods. This one will query the amount of Ether you own
-EtherAmount balance = ethClient.getBalance(address);
-print(balance.getValueInUnit(EtherUnit.ether));
-```
 
 ## Sending transactions
 
