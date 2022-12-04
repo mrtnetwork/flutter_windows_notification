@@ -10,15 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  window_manager: ^0.2.8
   plugin_platform_interface: ^2.0.2
-  system_tray: ^2.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  bitsdojo_window: ^0.1.5
   
 
 # For information on the generic Dart part of this file, see the
