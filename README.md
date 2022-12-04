@@ -36,7 +36,18 @@ NotificationMessage message = NotificationMessage.fromPluginTemplate(
 _winNotifyPlugin.showNotificationPluginTemplate(message);
 
 ```
+Notification with imge and large imgae
+
 ![fix2](https://user-images.githubusercontent.com/56779182/205485419-4303fdca-9f96-48e8-b6af-6f0df2ce8419.png)
+
+Notification with imge
+
+![fix3](https://user-images.githubusercontent.com/56779182/205485467-16f51b78-9dd4-4420-9de4-16c904e6871e.png)
+
+notification without any image
+
+![fix1](https://user-images.githubusercontent.com/56779182/205485486-abba6ed9-d56a-4a56-bbd5-0c7485376604.png)
+
 
 You can also create Wallet files with this library. To do so, you first need
 the private key you want to encrypt and a desired password. Then, create
