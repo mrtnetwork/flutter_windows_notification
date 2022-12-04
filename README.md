@@ -20,6 +20,8 @@ import 'package:windows_notification/windows_notification.dart';
 
 // Create an instance of Windows Notification with your application name
 final _winNotifyPlugin = WindowsNotification(applicationId: "ASGHAR ONLINE");
+
+
 // create new NotificationMessage instance with id, title, body, and images
 NotificationMessage message = NotificationMessage.fromPluginTemplate(
       "test1",
@@ -27,11 +29,14 @@ NotificationMessage message = NotificationMessage.fromPluginTemplate(
       "TEXT",
       largeImage: file_path,
       image: file_path
-    );
+);
+
+
 // show notification    
 _winNotifyPlugin.showNotificationPluginTemplate(message);
 
 ```
+![fix2](https://user-images.githubusercontent.com/56779182/205485419-4303fdca-9f96-48e8-b6af-6f0df2ce8419.png)
 
 You can also create Wallet files with this library. To do so, you first need
 the private key you want to encrypt and a desired password. Then, create
