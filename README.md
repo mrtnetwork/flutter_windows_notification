@@ -51,7 +51,7 @@ _winNotifyPlugin.showNotificationPluginTemplate(message);
 ![fix1](https://user-images.githubusercontent.com/56779182/205485486-abba6ed9-d56a-4a56-bbd5-0c7485376604.png)
 
 
-### Send notification with plugin template
+### Send notification with custom template
 
 You can use the template made by you to send the notification
 You can find a lot of templates code  with a simple search on the Internet
