@@ -38,7 +38,7 @@ NotificationMessage message = NotificationMessage.fromPluginTemplate(
 _winNotifyPlugin.showNotificationPluginTemplate(message);
 
 ```
-#### Notification with imge and large imgae
+#### Notification with imge and large image
 
 ![fix2](https://user-images.githubusercontent.com/56779182/205485419-4303fdca-9f96-48e8-b6af-6f0df2ce8419.png)
 
@@ -59,8 +59,10 @@ You can find a lot of templates code  with a simple search on the Internet
 
 #### Several examples of these templates
 
-```dart
-    const String template = '''
+
+```
+
+const String template = '''
 <toast activationType="protocol">
   <visual>
     <binding template="ToastGeneric">
@@ -73,17 +75,17 @@ You can find a lot of templates code  with a simple search on the Internet
         </subgroup>
         <subgroup hint-weight="1">
           <text hint-align="center">Mon</text>
-          <image src="C:/Users/HP/Desktop/wallet_images/sun.jpg" hint-removeMargin="true" />
+          <image src=".\image.jpg" hint-removeMargin="true" />
           <text hint-align="center">15°</text>
         </subgroup>
         <subgroup hint-weight="1">
           <text hint-align="center">Tue</text>
-          <image src="C:/Users/HP/Desktop/wallet_images/sun.jpg" hint-removeMargin="true" />
+          <image src=".\image.jpg" hint-removeMargin="true" />
           <text hint-align="center">17°</text>
         </subgroup>
         <subgroup hint-weight="1">
           <text hint-align="center">Wed</text>
-          <image src="C:/Users/HP/Desktop/wallet_images/w.jpg" hint-removeMargin="true" />
+          <image src=".\image.jpg" hint-removeMargin="true" />
           <text hint-align="center">21°</text>
         </subgroup>
       </group>
@@ -103,6 +105,7 @@ You can find a lot of templates code  with a simple search on the Internet
 
 
 
+
 ```
     const String template = '''
 <?xml version="1.0" encoding="utf-8"?>
@@ -114,7 +117,7 @@ You can find a lot of templates code  with a simple search on the Internet
       <group>
         <subgroup hint-weight="1" hint-textStacking="center">
           <text hint-align="center" hint-style="Header">GHASEM</text>
-          <image src="C:/Users/HP/Desktop/wallet_images/x.jpg" hint-crop="circle" hint-align="center" />
+          <image src=".\image.jpg" hint-crop="circle" hint-align="center" />
         </subgroup>
       </group>
     </binding>
@@ -137,12 +140,16 @@ You can find a lot of templates code  with a simple search on the Internet
 ![4](https://user-images.githubusercontent.com/56779182/205485879-2ca4e45a-3209-43fa-b338-7bf30cde2ca0.png)
 
 
+
+
 ### Delete all notifications sent by you from Windows Action Center
 
 ```
  _winNotifyPlugin.clearNotificationHistory();
  
 ```
+
+
 ### Delete notifications group sent by you from Windows Action Center
 When creating an instance of NotificationMessage , it is possible to add group to the notification
 
@@ -160,6 +167,8 @@ When creating an instance of NotificationMessage , it is possible to add group a
  
 ```
 
+
+
 ### Events and argruments
 To receive your notification events, you must use the ``` initNotificationCallBack ``` method
 
@@ -168,6 +177,8 @@ To receive your notification events, you must use the ``` initNotificationCallBa
         (NotificationMessage data, EventType eventType, String? arguments) {});
 
 ```
+
+
 
 ### Launch option
 
@@ -181,6 +192,8 @@ NotificationMessage message = NotificationMessage.fromPluginTemplate(
 _winNotifyPlugin.showNotificationPluginTemplate(message);
     
 ```
+
+
 
 
 ## Feature requests and bugs
