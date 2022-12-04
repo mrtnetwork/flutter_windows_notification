@@ -7,6 +7,8 @@ A library for sending notifications on Windows using Flutter
 - Receive notification events sent
 - Delete all notifications sent by you from Windows Action Center
 - Delete notifications group sent by you from Windows Action Center
+- Add deep link to notification
+
 
 ## Usage
 
@@ -94,78 +96,96 @@ You can find a lot of templates code  with a simple search on the Internet
         NotificationMessage.fromCustomTemplate("notificationid_1", group: "weather_group");
     _winNotifyPlugin.showNotificationCustomTemplate(message, template);
 ```
+
+#### An image of the notification related to the above code
+
 ![weather](https://user-images.githubusercontent.com/56779182/205485702-98ed8779-483f-433b-8f00-4ca5ca130fc5.png)
 
 
-## Sending transactions
 
-Of course, this library supports creating, signing and sending Ethereum
-transactions:
+```
+    const String template = '''
+<?xml version="1.0" encoding="utf-8"?>
+<toast launch="callLaunchArg" scenario="incomingCall" activationType="protocol">
+  <visual>
+    <binding template="ToastGeneric">
+      <text>ASGHAR CALL</text>
+      <text>Incoming Call</text>
+      <group>
+        <subgroup hint-weight="1" hint-textStacking="center">
+          <text hint-align="center" hint-style="Header">GHASEM</text>
+          <image src="C:/Users/HP/Desktop/wallet_images/x.jpg" hint-crop="circle" hint-align="center" />
+        </subgroup>
+      </group>
+    </binding>
+  </visual>
+  <actions>
+    <action content="Text reply" imageUri="" activationType="protocol" arguments="callReply" />
+    <action content="Ignore" imageUri="" activationType="protocol" arguments="callIgnore" />
+    <action content="Answer" imageUri="" activationType="protocol" arguments="callAnswer" />
+  </actions>
+</toast>
+''';
 
-```dart
-import 'package:web3dart/web3dart.dart';
-
-/// [...], you need to specify the url and your client, see example above
-var ethClient = Web3Client(apiUrl, httpClient);
-
-var credentials = EthPrivateKey.fromHex("0x...");
-
-await client.sendTransaction(
-  credentials,
-  Transaction(
-    to: EthereumAddress.fromHex('0xC91...3706'),
-    gasPrice: EtherAmount.inWei(BigInt.one),
-    maxGas: 100000,
-    value: EtherAmount.fromUnitAndValue(EtherUnit.ether, 1),
-  ),
-);
+    NotificationMessage message =
+        NotificationMessage.fromCustomTemplate("notificationid_1", group: "weather_group");
+    _winNotifyPlugin.showNotificationCustomTemplate(message, template);
 ```
 
-Missing data, like the gas price, the sender and a transaction nonce will be
-obtained from the connected node when not explicitly specified. If you only need
-the signed transaction but don't intend to send it, you can use
-`client.signTransaction`.
+#### An image of the notification related to the above code
 
-### Smart contracts
+![4](https://user-images.githubusercontent.com/56779182/205485879-2ca4e45a-3209-43fa-b338-7bf30cde2ca0.png)
 
-The library can parse the abi of a smart contract and send data to it. It can also
-listen for events emitted by smart contracts. See [this file](https://github.com/xclud/web3dart/blob/development/example/contracts.dart)
-for an example.
 
-### Dart Code Generator
+### Delete all notifications sent by you from Windows Action Center
 
-By using [Dart's build system](https://github.com/dart-lang/build/), web3dart can
-generate Dart code to easily access smart contracts.
+```
+ _winNotifyPlugin.clearNotificationHistory();
+ 
+```
+### Delete notifications group sent by you from Windows Action Center
+When creating an instance of NotificationMessage , it is possible to add group to the notification
 
-To use this feature, put a contract abi json somewhere into `lib/`.
-The filename has to end with `.abi.json`.
-Then, add a `dev_dependency` on the `build_runner` package and run
-
-```dart
-pub run build_runner build
+```
+   _winNotifyPlugin.removeNotificationGroup("groupname");
+ 
 ```
 
-You'll now find a `.g.dart` file containing code to interact with the contract.
 
-#### Optional: Ignore naming suggestions for generated files
+### Delete single notification with id and group
+When creating an instance of NotificationMessage , it is possible to add group and ID to the notification
 
-If importing contract ABIs with function names that don't follow dart's naming conventions, the dart analyzer will (by default) be unhappy about it, and show warnings.
-This can be mitigated by excluding all the generated files from being analyzed.  
-Note that this has the side effect of suppressing serious errors as well, should there exist any. (There shouldn't as these files are automatically generated).
-
-Create a file named `analysis_options.yaml` in the root directory of your project:
-
-```dart
-analyzer:
-  exclude: 
-    - '**/*.g.dart'
+```
+  _winNotifyPlugin.removeNotificationId("notificationid", "groupname");
+ 
 ```
 
-See [Customizing static analysis](https://dart.dev/guides/language/analysis-options) for advanced options.
+### Events and argruments
+To receive your notification events, you must use the ``` initNotificationCallBack ``` method
+
+```
+   _winNotifyPlugin.initNotificationCallBack(
+        (NotificationMessage data, EventType eventType, String? arguments) {});
+
+```
+
+### Launch option
+
+The Launch option allows you to embed your app's deep leak into the notification, and the target user will be redirected to the relevant page by tapping on the notification.
+
+```
+NotificationMessage message = NotificationMessage.fromPluginTemplate(
+  "test1", "You Win", "Tap to receive a gift",
+   launch: "my-app-schame://page1");
+   
+_winNotifyPlugin.showNotificationPluginTemplate(message);
+    
+```
+
 
 ## Feature requests and bugs
 
 Please file feature requests and bugs at the [issue tracker][tracker].
 If you want to contribute to this library, please submit a Pull Request.
 
-[tracker]: https://github.com/xclud/web3dart/issues/new
+[tracker]: https://github.com/MohsenHaydari/flutter_windows_notification/issues/new
