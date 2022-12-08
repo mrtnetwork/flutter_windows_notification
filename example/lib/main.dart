@@ -22,11 +22,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _winNotifyPlugin = WindowsNotification(applicationId: "ASGHAR ONLINE");
+  final _winNotifyPlugin = WindowsNotification(
+      applicationId:
+          r"{D65231B0-B2F1-4857-A4CE-A8E7C6EA7D27}\WindowsPowerShell\v1.0\powershell.exe");
 
   @override
   void initState() {
-    _winNotifyPlugin.initNotificationCallBack((data, s, d) {});
+    // final _winNotifyPlugin = WindowsNotification(applicationId: "qweqwe");
+    _winNotifyPlugin.initNotificationCallBack((notification, status, argruments) {
+      print("aargs: $argruments");
+    });
     super.initState();
   }
 
@@ -43,21 +48,21 @@ class _MyAppState extends State<MyApp> {
     // image tag src must be set
     const String template = '''
 <?xml version="1.0" encoding="utf-8"?>
-<toast activationType="protocol">
-  <visual>
-    <binding template="ToastGeneric">
-      <text id="1">Today's plan</text>
-         <text id="2">Our plan today is traveling to the moon</text>
-          <image placement="appLogoOverride" hint-crop="circle" id="1" src='C:/Users/HP/Desktop/wallet_images/x.jpg'/>
-          <image src='C:/Users/HP/Desktop/wallet_images/x3.jpg'/>
-    </binding>
-  </visual>
+  <toast launch='conversationId=9813' activationType="background">
+    <visual>
+        <binding template='ToastGeneric'>
+            <text>Some text</text>
+        </binding>
+    </visual>
+    <actions>
+        <action content='Archive'  arguments='action=archive'/>
+    </actions>
 </toast>
 ''';
+
     NotificationMessage message =
         NotificationMessage.fromCustomTemplate("test1", group: "jj");
     _winNotifyPlugin.showNotificationCustomTemplate(message, template);
-    // _winNotifyPlugin.removeNotificationGroup("jafa222r");
   }
 
   @override
@@ -70,7 +75,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Container(
+        body: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     sendMyOwnTemplate();
                   },
-                  child: Text("Send custom notification")),
+                  child: const Text("Send custom notification")),
               const SizedBox(
                 height: 15,
               ),
@@ -88,7 +93,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     sendWithPluginTemplate();
                   },
-                  child: Text("Send plugin notification")),
+                  child: const Text("Send plugin notification")),
               const SizedBox(
                 height: 15,
               ),
@@ -96,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     _winNotifyPlugin.clearNotificationHistory();
                   },
-                  child: Text("Clear action center notification")),
+                  child: const Text("Clear action center notification")),
               const SizedBox(
                 height: 15,
               ),
@@ -104,7 +109,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     _winNotifyPlugin.removeNotificationGroup("jj");
                   },
-                  child: Text("Clear group notification")),
+                  child: const Text("Clear group notification")),
               const SizedBox(
                 height: 15,
               ),
@@ -112,7 +117,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     _winNotifyPlugin.removeNotificationId("test1", "jj");
                   },
-                  child: Text("Remove single notification")),
+                  child: const Text("Remove single notification")),
             ],
           ),
         ),
