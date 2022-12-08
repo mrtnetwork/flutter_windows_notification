@@ -40,8 +40,9 @@ namespace windows_notification
             const flutter::MethodCall<flutter::EncodableValue> &method_call,
             std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
         winrt::Windows::UI::Notifications::ToastNotificationManager toastManager{};
-
+        
         std::unique_ptr<flutter::MethodChannel<>> channel_;
+        
 
     public:
         XmlDocument showNotificaationWithImage(std::string const title, std::string const body, std::string const image, std::string const temp);
