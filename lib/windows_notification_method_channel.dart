@@ -43,9 +43,9 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
 
   @override
   Future<void> showNotification(final NotificationMessage notification,
-      final String applicationId) async {
+      final String? applicationId) async {
     final data = notification.toJson;
-    data["application_id"] = applicationId;
+    if (applicationId != null) data["application_id"] = applicationId;
     String? templateXml = templates[notification.methodNmae]?.trim();
 
     if (notification.largeImage != null) {
@@ -61,34 +61,42 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
   @override
   Future<void> showNotificationCustomTemplate(
       final NotificationMessage notification,
-      final String applicationId,
+      final String? applicationId,
       final String template) async {
     assert(notification.temolateType == TemplateType.custom,
         "Use NotificationMessage.fromCustomTemplate to create notification object");
     final data = notification.toJson;
-    data["application_id"] = applicationId;
+    if (applicationId != null) data["application_id"] = applicationId;
     data["template"] = template;
     await methodChannel.invokeMethod(notification.methodNmae, data);
   }
 
   @override
-  Future<void> clearNotificationHistory(final String applicationId) async {
-    await methodChannel
-        .invokeMethod("clear_history", {"application_id": applicationId});
+  Future<void> clearNotificationHistory(final String? applicationId) async {
+    final Map<String, dynamic> data = {};
+    if (applicationId != null) data["application_id"] = applicationId;
+    await methodChannel.invokeMethod("clear_history", data);
   }
 
   @override
   Future<void> removeNotification(
-      String id, final String group, final String applicationId) async {
-    await methodChannel.invokeMethod("remove_notification",
-        {"tag": id, "group": group, "application_id": applicationId});
+      String id, final String group, final String? applicationId) async {
+    final Map<String, dynamic> data = {
+      "tag": id,
+      "group": group,
+    };
+    if (applicationId != null) data["application_id"] = applicationId;
+    await methodChannel.invokeMethod("remove_notification", data);
   }
 
   @override
   Future<void> removeNotificationGroup(
-      String group, final String applicationId) async {
-    await methodChannel.invokeMethod(
-        "remove_group", {"group": group, "application_id": applicationId});
+      String group, final String? applicationId) async {
+    final Map<String, dynamic> data = {
+      "group": group,
+    };
+    if (applicationId != null) data["application_id"] = applicationId;
+    await methodChannel.invokeMethod("remove_group", data);
   }
 
   @override
