@@ -12,7 +12,7 @@ class WindowsNotification {
   });
 
   ///Creates and initializes a new instance of the ToastNotification, bound to a specified app, usually another app in the same package.
-  final String applicationId;
+  String? applicationId;
 
   /// To send notifications with plugin templates you must create NotificationMessage with fromPluginTemplate constructor
   Future<void> showNotificationPluginTemplate(
