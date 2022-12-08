@@ -47,7 +47,6 @@ namespace windows_notification
         std::string const image = std::get<std::string>(args[flutter::EncodableValue("image")]);
         std::string const payload = std::get<std::string>(args[flutter::EncodableValue("payload")]);
         std::string const temp = std::get<std::string>(args[flutter::EncodableValue("template")]);
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
         XmlDocument doc = showNotificaationWithImage(title, body, image, temp);
         doc.DocumentElement().SetAttribute(L"payload", winrt::to_hstring(payload));
         auto value = isNull(args, "launch");
@@ -67,8 +66,19 @@ namespace windows_notification
           notif.Group(winrt::to_hstring(group));
         }
 
-        ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
-        toastNotifier_.Show(notif);
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
+          toastNotifier_.Show(notif);
+        }
+        else
+        {
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier()};
+          toastNotifier_.Show(notif);
+        }
+
         // test(t);
         result->Success(nullptr);
       }
@@ -78,7 +88,6 @@ namespace windows_notification
         std::string const tag = std::get<std::string>(args[flutter::EncodableValue("tag")]);
         std::string const payload = std::get<std::string>(args[flutter::EncodableValue("payload")]);
         std::string const temp = std::get<std::string>(args[flutter::EncodableValue("template")]);
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
         XmlDocument doc = showCustomTemplate(temp);
         doc.DocumentElement().SetAttribute(L"payload", winrt::to_hstring(payload));
         auto value = isNull(args, "launch");
@@ -86,10 +95,9 @@ namespace windows_notification
         {
           std::string const launchData = std::get<std::string>(args[flutter::EncodableValue("launch")]);
           doc.DocumentElement().SetAttribute(L"launch", winrt::to_hstring(launchData));
-         }
+        }
         ToastNotification notif{doc};
-        notif.Activated({this, &WindowsNotificationPlugin::onActivate});
-        notif.Dismissed({this, &WindowsNotificationPlugin::onDismissed});
+
         notif.Tag(winrt::to_hstring(tag));
         auto groupExist = isNull(args, "group");
         if (groupExist)
@@ -97,9 +105,20 @@ namespace windows_notification
           std::string const group = std::get<std::string>(args[flutter::EncodableValue("group")]);
           notif.Group(winrt::to_hstring(group));
         }
-
-        ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
-        toastNotifier_.Show(notif);
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
+          toastNotifier_.Show(notif);
+        }
+        else
+        {
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier()};
+          toastNotifier_.Show(notif);
+        }
+        notif.Activated({this, &WindowsNotificationPlugin::onActivate});
+        notif.Dismissed({this, &WindowsNotificationPlugin::onDismissed});
         // test(t);
         result->Success(nullptr);
       }
@@ -111,7 +130,6 @@ namespace windows_notification
         std::string const body = std::get<std::string>(args[flutter::EncodableValue("body")]);
         std::string const payload = std::get<std::string>(args[flutter::EncodableValue("payload")]);
         std::string const temp = std::get<std::string>(args[flutter::EncodableValue("template")]);
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
         XmlDocument doc = showNotificaationWithoutImage(title, body, temp);
         doc.DocumentElement().SetAttribute(L"payload", winrt::to_hstring(payload));
         auto value = isNull(args, "launch");
@@ -130,16 +148,35 @@ namespace windows_notification
           std::string const group = std::get<std::string>(args[flutter::EncodableValue("group")]);
           notif.Group(winrt::to_hstring(group));
         }
-        ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
-        toastNotifier_.Show(notif);
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier(winrt::to_hstring(appId))};
+          toastNotifier_.Show(notif);
+        }
+        else
+        {
+          ToastNotifier toastNotifier_{toastManager.CreateToastNotifier()};
+          toastNotifier_.Show(notif);
+        }
+
         // test(t);
         result->Success(nullptr);
       }
       else if (method_call.method_name().compare("clear_history") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
-        clearAllNotification(appId);
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          clearAllNotification(appId);
+        }
+        else
+        {
+          toastManager.History().Clear();
+        }
         result->Success(nullptr);
       }
       else if (method_call.method_name().compare("remove_notification") == 0)
@@ -147,17 +184,36 @@ namespace windows_notification
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         std::string const tag = std::get<std::string>(args[flutter::EncodableValue("tag")]);
         std::string const group = std::get<std::string>(args[flutter::EncodableValue("group")]);
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
-        removeNotificationTag(tag, group, appId);
+
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          removeNotificationTag(tag, group, appId);
+        }
+        else
+        {
+          toastManager.History().Remove(winrt::to_hstring(tag), winrt::to_hstring(group));
+        }
+
         result->Success(nullptr);
       }
       else if (method_call.method_name().compare("remove_group") == 0)
       {
 
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
-        std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
         std::string const group = std::get<std::string>(args[flutter::EncodableValue("group")]);
-        removeNotificationGroup(group, appId);
+        auto withAppId = isNull(args, "application_id");
+        if (withAppId)
+        {
+          std::string const appId = std::get<std::string>(args[flutter::EncodableValue("application_id")]);
+          removeNotificationGroup(group, appId);
+        }
+        else
+        {
+          toastManager.History().RemoveGroup(winrt::to_hstring(group));
+        }
+
         result->Success(nullptr);
       }
       else
@@ -204,6 +260,7 @@ namespace windows_notification
     XmlDocument const doc = notification.Content();
     winrt::hstring payload = doc.DocumentElement().GetAttribute(L"payload");
     ToastActivatedEventArgs ar = args.as<ToastActivatedEventArgs>();
+
     EncodableValue res = EncodableValue(EncodableMap{
         {EncodableValue("launch"), EncodableValue(winrt::to_string(payload))},
         {EncodableValue("arguments"), EncodableValue(winrt::to_string(ar.Arguments()))},
