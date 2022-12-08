@@ -27,13 +27,13 @@ abstract class WindowsNotificationPlatform extends PlatformInterface {
   }
 
   Future<void> showNotification(
-      final NotificationMessage notification, final String applicationId) {
+      final NotificationMessage notification, final String? applicationId) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
   Future<void> showNotificationCustomTemplate(
       final NotificationMessage notification,
-      final String applicationId,
+      final String? applicationId,
       final String template) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
@@ -42,17 +42,17 @@ abstract class WindowsNotificationPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<void> clearNotificationHistory(final String applicationId) {
+  Future<void> clearNotificationHistory(final String? applicationId) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
   Future<void> removeNotification(
-      final String id, final String group, final String applicationId) {
+      final String id, final String group, final String? applicationId) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
   Future<void> removeNotificationGroup(
-      final String group, final String applicationId) {
+      final String group, final String? applicationId) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }
