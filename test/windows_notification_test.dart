@@ -9,35 +9,40 @@ class MockWindowsNotificationPlatform
     with MockPlatformInterfaceMixin
     implements WindowsNotificationPlatform {
   @override
+  Future<void> clearNotificationHistory(String? applicationId) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> initNotificationCallBack(OnTapNotification? callback) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> showNotification(
-      NotificationMessage templaate, String applicationId) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> showNotificationCustomTemplate(NotificationMessage notification,
-      String applicationId, String templaate) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> clearNotificationHistory(String applicationId) {
+    // TODO: implement initNotificationCallBack
     throw UnimplementedError();
   }
 
   @override
   Future<void> removeNotification(
-      String id, String group, String applicationId) {
+      String id, String group, String? applicationId) {
+    // TODO: implement removeNotification
     throw UnimplementedError();
   }
 
   @override
-  Future<void> removeNotificationGroup(String group, String applicationId) {
+  Future<void> removeNotificationGroup(String group, String? applicationId) {
+    // TODO: implement removeNotificationGroup
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> showNotification(
+      NotificationMessage notification, String? applicationId) {
+    // TODO: implement showNotification
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> showNotificationCustomTemplate(NotificationMessage notification,
+      String? applicationId, String template) {
+    // TODO: implement showNotificationCustomTemplate
     throw UnimplementedError();
   }
 }
