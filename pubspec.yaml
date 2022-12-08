@@ -1,7 +1,8 @@
 name: windows_notification
-description: A new Flutter plugin project.
-version: 0.0.1
-homepage:
+description: flutter windows notification, Ability to send notification with desired template in Windows.
+version: 0.0.3
+homepage: https://github.com/MohsenHaydari
+repository: https://github.com/MohsenHaydari/flutter_windows_notification
 
 environment:
   sdk: '>=2.18.5 <3.0.0'
@@ -15,8 +16,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
