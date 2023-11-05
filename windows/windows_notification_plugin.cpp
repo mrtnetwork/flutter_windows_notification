@@ -56,8 +56,10 @@ namespace windows_notification
           doc.DocumentElement().SetAttribute(L"launch", winrt::to_hstring(launchData));
         }
         ToastNotification notif{doc};
+        
         notif.Activated({this, &WindowsNotificationPlugin::onActivate});
         notif.Dismissed({this, &WindowsNotificationPlugin::onDismissed});
+
         notif.Tag(winrt::to_hstring(tag));
         auto groupExist = isNull(args, "group");
         if (groupExist)
@@ -78,8 +80,6 @@ namespace windows_notification
           ToastNotifier toastNotifier_{toastManager.CreateToastNotifier()};
           toastNotifier_.Show(notif);
         }
-
-        // test(t);
         result->Success(nullptr);
       }
       else if (method_call.method_name().compare("custom_template") == 0)
@@ -260,21 +260,48 @@ namespace windows_notification
     XmlDocument const doc = notification.Content();
     winrt::hstring payload = doc.DocumentElement().GetAttribute(L"payload");
     ToastActivatedEventArgs ar = args.as<ToastActivatedEventArgs>();
+    Collections::ValueSet userInput = ar.UserInput();
 
-    EncodableValue res = EncodableValue(EncodableMap{
-        {EncodableValue("launch"), EncodableValue(winrt::to_string(payload))},
-        {EncodableValue("arguments"), EncodableValue(winrt::to_string(ar.Arguments()))},
-    });
+    EncodableMap notificationArgruments;
+    notificationArgruments[EncodableValue("launch")] = EncodableValue(winrt::to_string(payload));
+    notificationArgruments[EncodableValue("arguments")] = EncodableValue(winrt::to_string(ar.Arguments()));
+    EncodableMap userInputArgruments;
+    auto iterable = userInput.GetView();
+    for (auto const& pair : iterable)
+    {
+        winrt::hstring key = pair.Key();
+        IInspectable value = pair.Value();
+        auto keyStr = winrt::to_string(key);
+        auto valueStr = winrt::to_string(value.as<winrt::hstring>());
+        userInputArgruments[EncodableValue(keyStr)] = EncodableValue(valueStr);
+        
+    }
+    notificationArgruments[EncodableValue("user_input")]=EncodableValue(userInputArgruments);
+    EncodableValue res = EncodableValue(notificationArgruments);
     channel_->InvokeMethod("onActivate", std::make_unique<flutter::EncodableValue>(res));
   }
   void WindowsNotificationPlugin::onDismissed(Windows::UI::Notifications::ToastNotification const &notification, winrt::Windows::UI::Notifications::ToastDismissedEventArgs const &args)
   {
+    auto reason = args.Reason();
     XmlDocument const doc = notification.Content();
     winrt::hstring payload = doc.DocumentElement().GetAttribute(L"payload");
+    std::string methodName;
     EncodableValue res = EncodableValue(EncodableMap{
         {EncodableValue("launch"), EncodableValue(winrt::to_string(payload))},
     });
-    channel_->InvokeMethod("onDismissed", std::make_unique<flutter::EncodableValue>(res));
+          switch (reason)
+    {
+        case Windows::UI::Notifications::ToastDismissalReason::ApplicationHidden:
+            methodName = "onDismissedApplicationHidden";
+            break;
+        case Windows::UI::Notifications::ToastDismissalReason::UserCanceled:
+            methodName = "onDismissedUserCanceled";
+            break;
+        default:
+            methodName = "onDismissedTimedOut";
+            break;
+    }
+    channel_->InvokeMethod(methodName, std::make_unique<flutter::EncodableValue>(res));
   };
 
   void WindowsNotificationPlugin::clearAllNotification(std::string const appId)

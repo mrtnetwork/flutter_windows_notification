@@ -2,8 +2,7 @@ import 'package:windows_notification/notification_message.dart';
 
 import 'windows_notification_platform_interface.dart';
 
-typedef OnTapNotification = Function(
-    NotificationMessage notification, EventType eventType, String? argrument);
+typedef OnTapNotification = Function(NotificationCallBackDetails details);
 
 class WindowsNotification {
   WindowsNotification({

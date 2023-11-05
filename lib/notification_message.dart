@@ -1,6 +1,20 @@
 import 'dart:convert';
 
-enum EventType { onActivate, onDismissed }
+/// https://learn.microsoft.com/en-us/uwp/api/windows.ui.notifications.toastdismissalreason?view=winrt-22621
+enum EventType {
+  onActivate,
+
+  /// The app explicitly hid the toast notification by calling the ToastNotifier.hide method.
+  onDismissedApplicationHidden,
+
+  /// The user dismissed the toast notification.
+  onDismissedUserCanceled,
+
+  /// The toast notification had been shown for the maximum allowed time and was faded out.
+  /// The maximum time to show a toast notification is 7 seconds except in the case of long-duration toasts,
+  /// in which case it is 25 seconds.
+  onDismissedTimedOut
+}
 
 enum TemplateType { plugin, custom }
 
@@ -8,41 +22,40 @@ class NotificationMessage {
   final TemplateType temolateType;
   final String? title;
 
-  ///Gets or sets the group identifier for the notification.
+  /// Gets or sets the group identifier for the notification.
   final String? group;
   final String? body;
 
-  ///Thumbnail next to notification text
+  /// Thumbnail next to notification text
   final String? image;
 
-  ///Large image at the bottom of the notification text
+  /// Large image at the bottom of the notification text
   final String? largeImage;
   final Map<String, dynamic> payload;
 
-  ///Gets or sets the unique identifier of this notification within the notification Group.
+  /// Gets or sets the unique identifier of this notification within the notification Group.
   final String id;
 
-  ///A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
+  /// A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
   final String? launch;
 
   /// crete NotificationMessage object when you want to send notificaation with plugin template
   NotificationMessage.fromPluginTemplate(
-    ///Gets or sets the unique identifier of this notification within the notification Group.
+    /// Gets or sets the unique identifier of this notification within the notification Group.
     this.id,
     String this.title,
     String this.body, {
-
-    ///Thumbnail next to notification text
+    /// Thumbnail next to notification text
     this.image,
     this.payload = const {},
 
-    ///A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
+    /// A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
     this.launch,
 
-    ///Large image at the bottom of the notification text
+    /// Large image at the bottom of the notification text
     this.largeImage,
 
-    ///Gets or sets the group identifier for the notification.
+    /// Gets or sets the group identifier for the notification.
     this.group,
   }) : temolateType = TemplateType.plugin {
     assert(id.trim().isNotEmpty, "id must not be empty string");
@@ -52,14 +65,14 @@ class NotificationMessage {
 
   /// crete NotificationMessage object when you want to send notificaation with your own template
   NotificationMessage.fromCustomTemplate(
-    ///Gets or sets the unique identifier of this notification within the notification Group.
+    /// Gets or sets the unique identifier of this notification within the notification Group.
     this.id, {
     this.payload = const {},
 
-    ///A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
+    /// A string that is passed to the application when it is activated by the toast. The format and contents of this string are defined by the app for its own use. When the user taps or clicks the toast to launch its associated app, the launch string provides the context to the app that allows it to show the user a view relevant to the toast content, rather than launching in its default way.
     this.launch,
 
-    ///Gets or sets the group identifier for the notification.
+    /// Gets or sets the group identifier for the notification.
     this.group,
   })  : temolateType = TemplateType.custom,
         title = null,
@@ -76,20 +89,7 @@ class NotificationMessage {
           ? "show_notification"
           : "show_notification_image";
   Map<String, dynamic> get toJs {
-    if (image != null) {
-      return {
-        "title": title,
-        "body": body,
-        "image": image!,
-        "tag": id,
-        "payload": payload,
-        "group": group,
-        "launch": launch,
-        "temolateType": temolateType.name,
-        "largImage": largeImage
-      };
-    }
-    return {
+    final toJson = {
       "title": title,
       "body": body,
       "tag": id,
@@ -99,6 +99,11 @@ class NotificationMessage {
       "temolateType": temolateType.name,
       "largImage": largeImage
     };
+    if (image != null) {
+      toJson["imgae"] = image;
+    }
+
+    return toJson;
   }
 
   NotificationMessage.fromJson(final Map<String, dynamic> json)
@@ -114,24 +119,15 @@ class NotificationMessage {
             .firstWhere((element) => element.name == json["temolateType"]);
 
   Map<String, dynamic> get toJson {
-    Map<String, dynamic> messageJs = {};
+    Map<String, dynamic> messageJs = {
+      "title": title,
+      "body": body,
+      "tag": id,
+      "largImage": largeImage,
+      "payload": json.encode(toJs),
+    };
     if (image != null) {
-      messageJs = {
-        "title": title,
-        "body": body,
-        "image": image!,
-        "payload": json.encode(toJs),
-        "tag": id,
-        "largImage": largeImage
-      };
-    } else {
-      messageJs = {
-        "title": title,
-        "body": body,
-        "payload": json.encode(toJs),
-        "tag": id,
-        "largImage": largeImage
-      };
+      messageJs["image"] = image!;
     }
     if (launch != null) {
       messageJs["launch"] = launch;
@@ -139,7 +135,27 @@ class NotificationMessage {
     if (group != null) {
       messageJs["group"] = group;
     }
-
     return messageJs;
   }
+}
+
+class NotificationCallBackDetails {
+  NotificationCallBackDetails(
+      {required this.eventType,
+      required this.message,
+      required this.argrument,
+      required this.userInput});
+
+  /// event type
+  final EventType eventType;
+
+  /// notification messaage was send
+  final NotificationMessage message;
+
+  /// Gets the arguments associated with a toast action initiated by the user.
+  /// This arguments string was included in the toast's XML payload.
+  final String? argrument;
+
+  /// For toast notifications that include text boxes for user input, contains the user input.
+  final Map<String, dynamic> userInput;
 }

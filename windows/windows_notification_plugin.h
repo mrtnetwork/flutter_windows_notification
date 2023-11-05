@@ -1,24 +1,27 @@
 #ifndef FLUTTER_PLUGIN_WINDOWS_NOTIFICATION_PLUGIN_H_
 #define FLUTTER_PLUGIN_WINDOWS_NOTIFICATION_PLUGIN_H_
-
+#include <winrt/Windows.foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
 #include <windows.h>
-
 #include <winrt/Windows.UI.Notifications.h>
 #include <winrt/Windows.Data.Xml.Dom.h>
-#include <winrt/Windows.foundation.h>
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
+#include <flutter/basic_message_channel.h>
 #include <flutter/standard_method_codec.h>
 #include <memory>
 #include <fstream>
 #include <streambuf>
 #include <string>
+
+
 using namespace winrt;
 using namespace Windows::UI::Notifications;
 using namespace Windows::Data::Xml::Dom;
 using namespace Windows::Foundation;
 using flutter::EncodableMap;
 using flutter::EncodableValue;
+using flutter::BasicMessageChannel;
 namespace windows_notification
 {
 

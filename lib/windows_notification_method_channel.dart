@@ -47,7 +47,6 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
     final data = notification.toJson;
     if (applicationId != null) data["application_id"] = applicationId;
     String? templateXml = templates[notification.methodNmae]?.trim();
-
     if (notification.largeImage != null) {
       templateXml = templateXml?.replaceFirst("#1#", notification.largeImage!);
     } else {
@@ -92,9 +91,7 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
   @override
   Future<void> removeNotificationGroup(
       String group, final String? applicationId) async {
-    final Map<String, dynamic> data = {
-      "group": group,
-    };
+    final Map<String, dynamic> data = {"group": group};
     if (applicationId != null) data["application_id"] = applicationId;
     await methodChannel.invokeMethod("remove_group", data);
   }
@@ -103,19 +100,18 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
   Future<void> initNotificationCallBack(OnTapNotification? callback) async {
     tapCallBack = callback;
     methodChannel.setMethodCallHandler((MethodCall call) async {
-      try {
-        final Map<String, dynamic> payload =
-            json.decode(call.arguments["launch"]);
-        final NotificationMessage msg = NotificationMessage.fromJson(
-          payload,
-        );
-        EventType type = EventType.values
-            .firstWhere((element) => element.name == call.method);
-        tapCallBack?.call(msg, type, call.arguments["arguments"]);
-        // ignore: empty_catches
-      } catch (e) {
-        throw Exception("OnTapNotification arguments error $e");
-      }
+      final Map<String, dynamic> payload =
+          json.decode(call.arguments["launch"]);
+      final NotificationMessage msg = NotificationMessage.fromJson(payload);
+      EventType type =
+          EventType.values.firstWhere((element) => element.name == call.method);
+      final details = NotificationCallBackDetails(
+          argrument: call.arguments["arguments"],
+          eventType: type,
+          message: msg,
+          userInput:
+              Map<String, dynamic>.from(call.arguments["user_input"] ?? {}));
+      tapCallBack?.call(details);
     });
   }
 }
