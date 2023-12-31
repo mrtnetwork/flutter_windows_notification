@@ -272,7 +272,8 @@ namespace windows_notification
         winrt::hstring key = pair.Key();
         IInspectable value = pair.Value();
         auto keyStr = winrt::to_string(key);
-        auto valueStr = winrt::to_string(value.as<winrt::hstring>());
+        auto hstr = value.as<winrt::Windows::Foundation::IStringable>();
+        std::string valueStr = winrt::to_string(hstr.ToString());
         userInputArgruments[EncodableValue(keyStr)] = EncodableValue(valueStr);
         
     }
