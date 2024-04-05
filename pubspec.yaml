@@ -1,6 +1,6 @@
 name: windows_notification
 description: flutter windows notification, Ability to send notification with desired template in Windows.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/mrtnetwork/flutter_windows_notification
 repository: https://github.com/mrtnetwork/flutter_windows_notification
 
