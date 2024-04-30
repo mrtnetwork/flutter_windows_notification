@@ -55,4 +55,8 @@ abstract class WindowsNotificationPlatform extends PlatformInterface {
       final String group, final String? applicationId) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<void> init() async {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
 }

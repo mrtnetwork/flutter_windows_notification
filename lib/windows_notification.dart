@@ -29,6 +29,7 @@ class WindowsNotification {
 
   /// onActivate and onDismissed events of your sending notifications
   Future<void> initNotificationCallBack(OnTapNotification? callback) async {
+    await WindowsNotificationPlatform.instance.init();
     return WindowsNotificationPlatform.instance
         .initNotificationCallBack(callback);
   }
@@ -55,5 +56,9 @@ class WindowsNotification {
     }
     return WindowsNotificationPlatform.instance
         .removeNotificationGroup(group, applicationId);
+  }
+
+  Future<void> init() {
+    return WindowsNotificationPlatform.instance.init();
   }
 }

@@ -4,6 +4,7 @@
 
 #include "windows_notification_plugin.h"
 
+
 void WindowsNotificationPluginCApiRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar) {
   windows_notification::WindowsNotificationPlugin::RegisterWithRegistrar(

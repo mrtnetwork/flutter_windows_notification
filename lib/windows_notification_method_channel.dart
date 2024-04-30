@@ -100,6 +100,7 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
   Future<void> initNotificationCallBack(OnTapNotification? callback) async {
     tapCallBack = callback;
     methodChannel.setMethodCallHandler((MethodCall call) async {
+      print("callled ${call.method} ${call.arguments}");
       final Map<String, dynamic> payload =
           json.decode(call.arguments["launch"]);
       final NotificationMessage msg = NotificationMessage.fromJson(payload);
@@ -113,5 +114,10 @@ class MethodChannelWindowsNotification extends WindowsNotificationPlatform {
               Map<String, dynamic>.from(call.arguments["user_input"] ?? {}));
       tapCallBack?.call(details);
     });
+  }
+
+  @override
+  Future<void> init() async {
+    await methodChannel.invokeMethod("init", {});
   }
 }

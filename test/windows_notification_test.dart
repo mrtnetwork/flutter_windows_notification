@@ -40,6 +40,12 @@ class MockWindowsNotificationPlatform
       String? applicationId, String template) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> init() {
+    // TODO: implement init
+    throw UnimplementedError();
+  }
 }
 
 void main() {

@@ -12,7 +12,7 @@ namespace windows_notification
             registrar->messenger(), "windows_notification",
             &flutter::StandardMethodCodec::GetInstance());
     auto *channel_pointer = channel.get();
-    auto plugin = std::make_unique<WindowsNotificationPlugin>(std::move(channel));
+    auto plugin = std::make_unique<WindowsNotificationPlugin>(std::move(registrar));
 
     channel_pointer->SetMethodCallHandler(
         [plugin_pointer = plugin.get()](const auto &call, auto result)
@@ -23,22 +23,38 @@ namespace windows_notification
     registrar->AddPlugin(std::move(plugin));
   }
 
-  WindowsNotificationPlugin::WindowsNotificationPlugin(std::unique_ptr<flutter::MethodChannel<>> channel)
-  {
-    channel_ = std::move(channel);
-  }
+  	WindowsNotificationPlugin::WindowsNotificationPlugin(flutter::PluginRegistrarWindows* registrar) : registrar(registrar) {
+		channel_ =
+			std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(registrar->messenger(),
+				"windows_notification",
+				&flutter::StandardMethodCodec::GetInstance());
 
+		proc_id = registrar->RegisterTopLevelWindowProcDelegate(
+			[this](HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+				return WProc(hWnd, message, wParam, lParam);
+			});
+    codec_ = &flutter::StandardMethodCodec::GetInstance();
+      
+	}
   WindowsNotificationPlugin::~WindowsNotificationPlugin()
   {
   }
+
+  HWND WindowsNotificationPlugin::GetWindow() {
+		return current_window;
+	}
 
   void WindowsNotificationPlugin::HandleMethodCall(
       const flutter::MethodCall<flutter::EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
+    const std::string methodName = method_call.method_name();
     try
     {
-      if (method_call.method_name().compare("show_notification_image") == 0)
+    if (methodName.compare("init") == 0){
+    init();
+    result->Success(true);
+    }else if (methodName.compare("show_notification_image") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         std::string const title = std::get<std::string>(args[flutter::EncodableValue("title")]);
@@ -82,7 +98,7 @@ namespace windows_notification
         }
         result->Success(nullptr);
       }
-      else if (method_call.method_name().compare("custom_template") == 0)
+      else if (methodName.compare("custom_template") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         std::string const tag = std::get<std::string>(args[flutter::EncodableValue("tag")]);
@@ -122,7 +138,7 @@ namespace windows_notification
         // test(t);
         result->Success(nullptr);
       }
-      else if (method_call.method_name().compare("show_notification") == 0)
+      else if (methodName.compare("show_notification") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         std::string const title = std::get<std::string>(args[flutter::EncodableValue("title")]);
@@ -164,7 +180,7 @@ namespace windows_notification
         // test(t);
         result->Success(nullptr);
       }
-      else if (method_call.method_name().compare("clear_history") == 0)
+      else if (methodName.compare("clear_history") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         auto withAppId = isNull(args, "application_id");
@@ -179,7 +195,7 @@ namespace windows_notification
         }
         result->Success(nullptr);
       }
-      else if (method_call.method_name().compare("remove_notification") == 0)
+      else if (methodName.compare("remove_notification") == 0)
       {
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
         std::string const tag = std::get<std::string>(args[flutter::EncodableValue("tag")]);
@@ -198,7 +214,7 @@ namespace windows_notification
 
         result->Success(nullptr);
       }
-      else if (method_call.method_name().compare("remove_group") == 0)
+      else if (methodName.compare("remove_group") == 0)
       {
 
         auto args = std::get<flutter::EncodableMap>(*method_call.arguments());
@@ -279,7 +295,7 @@ namespace windows_notification
     }
     notificationArgruments[EncodableValue("user_input")]=EncodableValue(userInputArgruments);
     EncodableValue res = EncodableValue(notificationArgruments);
-    channel_->InvokeMethod("onActivate", std::make_unique<flutter::EncodableValue>(res));
+    sendToMainThread("onActivate",res);
   }
   void WindowsNotificationPlugin::onDismissed(Windows::UI::Notifications::ToastNotification const &notification, winrt::Windows::UI::Notifications::ToastDismissedEventArgs const &args)
   {
@@ -302,7 +318,7 @@ namespace windows_notification
             methodName = "onDismissedTimedOut";
             break;
     }
-    channel_->InvokeMethod(methodName, std::make_unique<flutter::EncodableValue>(res));
+    sendToMainThread(methodName,res);
   };
 
   void WindowsNotificationPlugin::clearAllNotification(std::string const appId)
@@ -313,11 +329,17 @@ namespace windows_notification
   void WindowsNotificationPlugin::removeNotificationTag(std::string const tag, std::string const group, std::string const appId)
   {
     toastManager.History().Remove(winrt::to_hstring(tag), winrt::to_hstring(group), winrt::to_hstring(appId));
+    
   }
   void WindowsNotificationPlugin::removeNotificationGroup(std::string const group, std::string const appId)
   {
     toastManager.History().RemoveGroup(winrt::to_hstring(group), winrt::to_hstring(appId));
   }
+    void WindowsNotificationPlugin::init()
+  {
+    current_window = ::GetAncestor(registrar->GetView()->GetNativeWindow(), GA_ROOT);
+  }
+  
   const EncodableValue *WindowsNotificationPlugin::isNull(const EncodableMap &map, const char *key)
   {
     auto it = map.find(EncodableValue(key));
@@ -327,5 +349,36 @@ namespace windows_notification
     }
     return &(it->second);
   }
+  	std::optional<LRESULT> WindowsNotificationPlugin::WProc(HWND hWnd,
+		UINT message,
+		WPARAM wParam,
+		LPARAM lParam) {
+    if(message == NotificationThreadMessageId){
+        handleBackgroundMessage(lParam);
+    }
+    return std::nullopt;
+    }
 
+void WindowsNotificationPlugin::sendToMainThread(std::string methodName,EncodableValue value){
+    const flutter::MethodCall<flutter::EncodableValue> method_call(methodName,std::make_unique<flutter::EncodableValue>(value));
+    std::unique_ptr<std::vector<uint8_t>> message =
+         codec_->EncodeMethodCall(method_call);
+    std::vector<uint8_t>* rawVector = message.release(); // Release ownership from unique_ptr
+    LPARAM lParam = reinterpret_cast<LPARAM>(rawVector);
+    PostMessage(GetWindow(), NotificationThreadMessageId, 0,lParam);
+}
+void WindowsNotificationPlugin::handleBackgroundMessage(LPARAM lParam){
+std::vector<uint8_t>* rawVector = reinterpret_cast<std::vector<uint8_t>*>(lParam);
+if(rawVector){
+  std::unique_ptr<std::vector<uint8_t>> msg(rawVector);
+  size_t dataSize = msg->size();
+  const uint8_t* rawData = msg->data();
+  auto decode = codec_->DecodeMethodCall(rawData,dataSize);
+  if(decode){
+  auto args = std::make_unique<flutter::EncodableValue>(*decode->arguments()) ;
+  channel_->InvokeMethod(decode->method_name(), std::make_unique<flutter::EncodableValue>(*args));
+  }
+}
+}
 } // namespace windows_notification
+
