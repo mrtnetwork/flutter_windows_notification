@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:windows_notification/notification_message.dart';
 import 'package:windows_notification/windows_notification.dart';
-import 'package:windows_notification_example/templates/alarm_template.dart';
+import 'package:example/templates/alarm_template.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:windows_notification_example/templates/meeting_template.dart';
+import 'package:example/templates/meeting_template.dart';
 
 void main() {
   runApp(const MaterialApp(

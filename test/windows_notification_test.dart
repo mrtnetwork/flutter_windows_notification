@@ -43,7 +43,6 @@ class MockWindowsNotificationPlatform
 
   @override
   Future<void> init() {
-    // TODO: implement init
     throw UnimplementedError();
   }
 }

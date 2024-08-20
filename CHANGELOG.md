@@ -1,3 +1,7 @@
+## 1.3.0
+
+ * fix issue [#22](https://github.com/mrtnetwork/flutter_windows_notification/issues/22)
+
 ## 1.2.0
 
  * fix issue [#18](https://github.com/mrtnetwork/flutter_windows_notification/issues/18)
